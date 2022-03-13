@@ -4,14 +4,14 @@
 #include "utilities.h"
 
 const float w0 = 12.0/36.0;  // zero weight
-const float ws = 2.0/18.0;  // adjacent weight
+const float ws = 2.0/36.0;  // adjacent weight
 const float wd = 1.0/36.0; // diagonal weight
 
 const unsigned int scale = 2;
 const unsigned int NX = 512;
 const unsigned int NY = 256;
 const unsigned int NZ = 32;
-const unsigned int NSTEPS = 200*scale*scale;
+const unsigned int NSTEPS = 1*scale*scale;
 
 const unsigned int ndir = 19;
 const unsigned int mem_size_0dir   = sizeof(float)*NX*NY*NZ;
@@ -29,20 +29,26 @@ extern bool *gpu_boundary;
 
 __device__ __forceinline__ unsigned int gpu_field0_index(unsigned int x, unsigned int y, unsigned int z)
 {
-    return NX*y+x;
+    return (z*(NX*NY) + NX*y + x);
 }
 
 __device__ __forceinline__ unsigned int gpu_scalar_index(unsigned int x, unsigned int y, unsigned int z)
 {
-    return NX*y+x;
+    return (z*(NX*NY) + NX*y + x);
 }
 
 __device__ __forceinline__ unsigned int gpu_fieldn_index(unsigned int x, unsigned int y, unsigned int z, unsigned int d)
 {
-    return (NX*(NY*(d-1)+y)+x);
+    return ((d-1)*NX*NY*NZ + z*(NX*NY) + NX*y + x);
 }
 
 __host__ void cpu_equi_Initialization();
-__global__ void gpu_equi_Initialization(bool *boundary, float *rho, float *ux, float *uy, float *uz);
 
+__global__ void gpu_equi_Initialization(float *f0, float *f1, float *rho, 
+float *ux, float *uy, float *uz);
+
+__host__ void cpu_stream_collide();
+
+__global__ void gpu_stream_collide(float *f0, float *f1, float *f2, float *rho
+, float *ux, float *uy, float *uz);
 #endif

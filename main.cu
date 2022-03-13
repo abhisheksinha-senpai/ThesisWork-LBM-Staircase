@@ -15,6 +15,11 @@ int main(int argc, char* argv[])
 
     cpu_field_Initialization();
     cpu_field_Initialization();
+
+    for(usnsigned n=0;n<NSTEPS;n++)
+    {
+        
+    }
     DeallocateMemory();
 
     // checkCudaErrors(cudaEventDestroy(start));

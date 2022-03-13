@@ -19,18 +19,9 @@ __host__ void cpu_field_Initialization()
 
 __global__ void gpu_field_Initialization(bool *boundary, float *rho, float *ux, float *uy, float *uz)
 {
-    unsigned int tx = threadIdx.x;
-    unsigned int ty = threadIdx.y;
-    unsigned int tz = threadIdx.z;
-    unsigned int bx = blockIdx.x;
-    unsigned int by = blockIdx.y;
-    unsigned int bz = blockIdx.y;
-    unsigned int bw = blockDim.x;
-    unsigned int bh = blockDim.y;
-    unsigned int bd = blockDim.z;
-    unsigned int idx = tx + bx * bw;
-    unsigned int idy = ty + by * bh;
-    unsigned int idz = tz + bz * bd;
+    unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    unsigned int idy = threadIdx.y + blockIdx.y * blockDim.y;
+    unsigned int idz = threadIdx.z +  blockIdx.y * blockDim.z;
 
     unsigned int sidx = gpu_scalar_index(idx, idy, idz);
     rho[sidx] = (boundary[sidx] == true)?1:0;
