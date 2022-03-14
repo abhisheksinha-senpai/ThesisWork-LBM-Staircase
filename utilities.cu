@@ -9,8 +9,6 @@ float *f0_gpu,*f1_gpu,*f2_gpu;
 float *rho_gpu,*ux_gpu,*uy_gpu, *uz_gpu;
 float *prop_gpu;
 float *scalar_host;
-bool *cpu_boundary;
-bool *gpu_boundary;
 
 void getDeviceInfo()
 {
@@ -48,19 +46,21 @@ void AllocateMemory()
     checkCudaErrors(cudaMalloc((void**)&uy_gpu,mem_size_scalar));
     checkCudaErrors(cudaMalloc((void**)&uz_gpu,mem_size_scalar));
     checkCudaErrors(cudaMalloc((void**)&gpu_boundary,mem_size_bound));
+    checkCudaErrors(cudaMalloc((void**)&gpu_normals,mem_size_normal));
     mem_size_props = 0;//7*NX/nThreads*NY*sizeof(float);
     // checkCudaErrors(cudaMalloc((void**)&prop_gpu,mem_size_props));
 
     scalar_host  = (float*) malloc(mem_size_scalar);
     cpu_boundary = (bool *)malloc(mem_size_bound);
-    if(scalar_host == NULL || cpu_boundary == NULL)
+    cpu_normals = (short *)malloc(mem_size_normals);
+    if(scalar_host == NULL || cpu_boundary == NULL || cpu_normals == NULL )
     {
         fprintf(stderr,"Error: unable to allocate required host memory (%.1f MiB).\n",mem_size_scalar/bytesPerMiB);
         exit(-1);
     }
     else
     {
-        unsigned int gpu_total = mem_size_0dir + 2*mem_size_n0dir + 4* mem_size_scalar + mem_size_props + mem_size_bound;
+        unsigned int gpu_total = mem_size_0dir + 2*mem_size_n0dir + 4* mem_size_scalar + mem_size_props + mem_size_bound + mem_size_normals;
         printf("Allocated %.1f MiB memory in CPU and %.1f MiB in GPU\n",mem_size_scalar/bytesPerMiB, gpu_total/bytesPerMiB);
     }
 }
@@ -78,8 +78,10 @@ void DeallocateMemory()
     checkCudaErrors(cudaFree(uz_gpu));
     // checkCudaErrors(cudaFree(prop_gpu));
     checkCudaErrors(cudaFree(gpu_boundary));
+    checkCudaErrors(cudaFree(gpu_normals));
     free(scalar_host);
     free(cpu_boundary);
+    free(cpu_normals);
     
     // release resources associated with the GPU device
     cudaDeviceReset();
