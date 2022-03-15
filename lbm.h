@@ -52,7 +52,7 @@ float *ux, float *uy, float *uz);
 
 __host__ void cpu_stream_collide(bool save);
 
-__global__ void gpu_stream_collide(short* boundary, short* normals, float *f0, float *f1, float *f2, float *rho
+__global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float *f2, float *rho
 , float *ux, float *uy, float *uz, bool save);
 
 __device__ void collide(float *field,int x, int y, int z,

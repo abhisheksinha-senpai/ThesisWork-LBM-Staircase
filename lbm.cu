@@ -1,6 +1,8 @@
 #include "lbm.h"
+#include "utilities.h"
+#include "boundary.h"
 
-__device__ void collide(float *field,int indexX, int indexY, int indexZ,
+__device__ void collide(float *field,int x, int y, int z,
      float omusq, float tux, float tuy, float tuz, float wsr, float wsd)
 {
     float cidot3u = tux;
@@ -69,7 +71,7 @@ __global__ void gpu_equi_Initialization(float *f0, float *f1, float *rho, float 
     float tuy = 3.0*lattice_uy;
     float tuz = 3.0*lattice_uz;
 
-    f0[gpu_field0_index(x,y,z)] = w0r*(omusq);
+    f0[gpu_field0_index(idx,idy,idz)] = w0r*(omusq);
     
     collide(f1,idx, idy, idz, omusq, tux, tuy, tuz, wsr, wdr);
 
@@ -85,18 +87,18 @@ __host__ void cpu_equi_Initialization()
     getLastCudaError("gpu_equi_Initialization kernel error");
 }
 
-__host__ void cpu_stream_collide()
+__host__ void cpu_stream_collide(bool save)
 {
     dim3  grid(NX/nThreads, NY, 1);
     // threads in block
     dim3  threads(nThreads, 1, 1);
 
     gpu_stream_collide<<< grid, threads >>>(gpu_boundary, f0_gpu, f1_gpu, f2_gpu, rho_gpu,
-        ux_gpu, uy_gpu, uz_gpu);
+        ux_gpu, uy_gpu, uz_gpu, save);
     getLastCudaError("gpu_stream_collide kernel error");
 }
 
-__global__ void gpu_stream_collide(short* boundary, short* normals, float *f0, float *f1, float *f2, float *rho
+__global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float *f2, float *rho
 , float *ux, float *uy, float *uz, bool save)
 {
     const float tauinv = 2.0/(6.0*nu+1.0); // 1/tau
@@ -164,24 +166,31 @@ __global__ void gpu_stream_collide(short* boundary, short* normals, float *f0, f
         ft18 = f1[gpu_fieldn_index(idx, idy, idz, 18)];
     }
 
-    float rho = ft0+ft1+ft2+ft3+ft4+ft5+ft6+ft7+ft8+ft9+ft10+ft11+ft12+ft13+ft14+ft15+ft16+ft17+ft18;
-    float rhoinv = 1.0/(rho+0.00001);
+    float lat_rho = ft0+ft1+ft2+ft3+ft4+ft5+ft6+ft7+ft8+ft9+ft10+ft11+ft12+ft13+ft14+ft15+ft16+ft17+ft18;
+    float rhoinv = 1.0/(lat_rho+0.00001);
 
-    float ux = (bound==4)?0:rhoinv*(ft1+ft7+ft9+f13+f15-(ft2+ft8+ft10+f14+f16));
-    float uy = (bound==4)?0:rhoinv*(ft3+ft7+ft11+f14+f17-(ft4+ft8+ft12+f13+f18));
-    float uz = (bound==4)?0:rhoinv*(ft5+ft9+ft11+f16+f18-(ft6+ft10+ft12+f15+f17));
+    float lat_ux = (bound==4)?0:rhoinv*(ft1+ft7+ft9+ft13+ft15-(ft2+ft8+ft10+ft14+ft16));
+    float lat_uy = (bound==4)?0:rhoinv*(ft3+ft7+ft11+ft14+ft17-(ft4+ft8+ft12+ft13+ft18));
+    float lat_uz = (bound==4)?0:rhoinv*(ft5+ft9+ft11+ft16+ft18-(ft6+ft10+ft12+ft15+ft17));
 
-    float tw0r = tauinv*w0*rho; //   w[0]*rho/tau 
-    float twsr = tauinv*ws*rho; // w[1-4]*rho/tau
-    float twdr = tauinv*wd*rho; // w[5-8]*rho/tau
-    float omusq = 1.0 - 1.5*(ux*ux+uy*uy+*uz*uz); // 1-(3/2)u.u
+    float tw0r = tauinv*w0*lat_rho; //   w[0]*rho/tau 
+    float twsr = tauinv*ws*lat_rho; // w[1-4]*rho/tau
+    float twdr = tauinv*wd*lat_rho; // w[5-8]*rho/tau
+    float omusq = 1.0 - 1.5*(lat_ux*lat_ux+lat_uy*lat_uy+lat_uz*lat_uz); // 1-(3/2)u.u
 
-    float cidot3u = tux;
-    float tux = 3.0*ux;
-    float tuy = 3.0*uy;
-    float tuz = 3.0*uz;
+    if(save)
+    {
+        rho[gpu_scalar_index(idx, idy, idz)] = lat_rho;
+        ux[gpu_scalar_index(idx, idy, idz)] = lat_ux;
+        uy[gpu_scalar_index(idx, idy, idz)] = lat_uv;
+        uz[gpu_scalar_index(idx, idy, idz)] = lat_uz;
+    }
 
-    f0[gpu_field0_index(x,y,z)] = w0r*(omusq);
+    float tux = 3.0*lat_ux;
+    float tuy = 3.0*lat_uy;
+    float tuz = 3.0*lat_uz;
+
+    f0[gpu_field0_index(idx,idy,idz)] = tw0r*(omusq);
     
     collide(f2,idx, idy, idz, omusq, tux, tuy, tuz, twsr, twdr);
 
