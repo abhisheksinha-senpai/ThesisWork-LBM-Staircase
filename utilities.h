@@ -16,7 +16,7 @@ inline void __checkCudaErrors(cudaError_t err, const char *const func, const cha
 {
     if(err != cudaSuccess)
     {
-        fprintf(stderr, "CUDA error at %s(%d)\"%s\": [%d] %s.\n",
+        fprintf(stderr, "\nCUDA error at %s(%d)\"%s\": [%d] %s.\n",
                 file, line, func, (int)err, cudaGetErrorString(err));
         exit(-1);
     }
@@ -26,14 +26,15 @@ inline void __getLastCudaError(const char *const errorMessage, const char *const
 {
     cudaError_t err = cudaGetLastError();
     if(err != cudaSuccess) {
-        fprintf(stderr, "CUDA error at %s(%d): [%d] %s.\n",
+        fprintf(stderr, "\nCUDA error at %s(%d): [%d] %s.\n",
                 file, line, (int)err, cudaGetErrorString(err));
         exit(-1);
     }
 }
 
-void getDeviceInfo();
-void AllocateMemory();
-void DeallocateMemory();
+__host__ void getDeviceInfo();
+__host__ void AllocateMemory();
+__host__ void DeallocateMemory();
+__host__ void logger(const char* name, float *gpu_src, unsigned int n);
 
 #endif

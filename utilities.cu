@@ -10,7 +10,7 @@ float *rho_gpu,*ux_gpu,*uy_gpu, *uz_gpu;
 float *prop_gpu;
 float *scalar_host;
 
-void getDeviceInfo()
+__host__ void getDeviceInfo()
 {
     double bytesPerMiB = 1024.0*1024.0;
     double bytesPerGiB = 1024.0*1024.0*1024.0;
@@ -35,7 +35,7 @@ void getDeviceInfo()
     return;
 }
 
-void AllocateMemory()
+__host__ void AllocateMemory()
 {
     double bytesPerMiB = 1024.0*1024.0;
     checkCudaErrors(cudaMalloc((void**)&f0_gpu,mem_size_0dir));
@@ -51,8 +51,8 @@ void AllocateMemory()
     // checkCudaErrors(cudaMalloc((void**)&prop_gpu,mem_size_props));
 
     scalar_host  = (float*) malloc(mem_size_scalar);
-    cpu_boundary = (bool *)malloc(mem_size_bound);
-    cpu_normals = (short *)malloc(mem_size_normals);
+    cpu_boundary = (short *)malloc(mem_size_bound);
+    cpu_normals = (short *)malloc(mem_size_normal);
     if(scalar_host == NULL || cpu_boundary == NULL || cpu_normals == NULL )
     {
         fprintf(stderr,"Error: unable to allocate required host memory (%.1f MiB).\n",mem_size_scalar/bytesPerMiB);
@@ -60,12 +60,12 @@ void AllocateMemory()
     }
     else
     {
-        unsigned int gpu_total = mem_size_0dir + 2*mem_size_n0dir + 4* mem_size_scalar + mem_size_props + mem_size_bound + mem_size_normals;
+        unsigned int gpu_total = mem_size_0dir + 2*mem_size_n0dir + 4* mem_size_scalar + mem_size_props + mem_size_bound + mem_size_normal;
         printf("Allocated %.1f MiB memory in CPU and %.1f MiB in GPU\n",mem_size_scalar/bytesPerMiB, gpu_total/bytesPerMiB);
     }
 }
 
-void DeallocateMemory()
+__host__ void DeallocateMemory()
 {
   
     // free all memory allocatd on the GPU and host

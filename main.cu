@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[])
 {
-    cudaDeviceReset();
+    //cudaDeviceReset();
     getDeviceInfo();
     // cudaEvent_t start, stop;
 
@@ -14,13 +14,25 @@ int main(int argc, char* argv[])
     // checkCudaErrors(cudaEventCreate(&stop));
 
     cpu_field_Initialization();
-    cpu_field_Initialization();
-
-    for(usnsigned n=0;n<NSTEPS;n++)
+    cpu_equi_Initialization();
+    float *temp;
+    bool save = false;
+    for(unsigned n=0;n<NSTEPS;n++)
     {
-        
+        cpu_stream_collide(save);
+        temp = f1_gpu;
+        f1_gpu = f2_gpu;
+        f2_gpu = temp;
+        save = ((n+1)%NSAVE == 0);
+        if(save)
+        {
+            logger("rho",rho_gpu,n+1);
+            logger("ux", ux_gpu, n+1);
+            logger("uy", uy_gpu, n+1);
+            logger("uz", uz_gpu, n+1);
+        }
     }
-    DeallocateMemory();
+   DeallocateMemory();
 
     // checkCudaErrors(cudaEventDestroy(start));
     // checkCudaErrors(cudaEventDestroy(stop));
