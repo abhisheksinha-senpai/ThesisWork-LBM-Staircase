@@ -19,11 +19,11 @@ int main(int argc, char* argv[])
     bool save = false;
     for(unsigned n=0;n<NSTEPS;n++)
     {
+        save = ((n+1)%NSAVE == 0);
         cpu_stream_collide(save);
         temp = f1_gpu;
         f1_gpu = f2_gpu;
         f2_gpu = temp;
-        save = ((n+1)%NSAVE == 0);
         if(save)
         {
             logger("rho",rho_gpu,n+1);

@@ -16,7 +16,7 @@ __host__ void cpu_field_Initialization()
     // blocks in grid
     dim3  grid(NX/nThreads, NY, NZ);
     // threads in block
-    dim3  threads(nThreads, 1, 1);
+    dim3  threads(nThreads, 1);
 
     gpu_field_Initialization<<< grid, threads >>>(gpu_boundary, rho_gpu, ux_gpu, uy_gpu, uz_gpu, f1_gpu, f0_gpu);
     getLastCudaError("\ngpu_field_Initialization kernel error\n");

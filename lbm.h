@@ -13,8 +13,8 @@ const unsigned int scale = 1;
 const unsigned int NX = 32;
 const unsigned int NY = 16;
 const unsigned int NZ = 1;
-const unsigned int NSTEPS = 1*scale*scale;
-const unsigned int NSAVE  =  1*scale*scale;
+const unsigned int NSTEPS = 50*scale*scale;
+const unsigned int NSAVE  =  10*scale*scale;
 
 const unsigned int ndir = 19;
 const unsigned int mem_size_0dir   = sizeof(float)*NX*NY*NZ;
