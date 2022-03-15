@@ -182,7 +182,7 @@ __global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float 
     {
         rho[gpu_scalar_index(idx, idy, idz)] = lat_rho;
         ux[gpu_scalar_index(idx, idy, idz)] = lat_ux;
-        uy[gpu_scalar_index(idx, idy, idz)] = lat_uv;
+        uy[gpu_scalar_index(idx, idy, idz)] = lat_uy;
         uz[gpu_scalar_index(idx, idy, idz)] = lat_uz;
     }
 
