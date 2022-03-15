@@ -104,7 +104,7 @@ __global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float 
     const float tauinv = 2.0/(6.0*nu+1.0); // 1/tau
     unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
     unsigned int idy = threadIdx.y + blockIdx.y * blockDim.y;
-    unsigned int idz = threadIdx.z +  blockIdx.y * blockDim.z;
+    unsigned int idz = threadIdx.z +  blockIdx.z * blockDim.z;
 
     short bound = boundary[gpu_scalar_index(idx, idy, idz)];
 
@@ -180,10 +180,10 @@ __global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float 
 
     if(save)
     {
-        rho[0] = lat_rho;
-        ux[1] = lat_ux;
-        uy[2] = lat_uy;
-        uz[3] = lat_uz;
+        rho[gpu_scalar_index(idx, idy, idz)] = lat_rho;
+        ux[gpu_scalar_index(idx, idy, idz)] = lat_ux;
+        uy[gpu_scalar_index(idx, idy, idz)] = lat_uy;
+        uz[gpu_scalar_index(idx, idy, idz)] = lat_uz;
     }
 
     float tux = 3.0*lat_ux;

@@ -1,7 +1,8 @@
 #include "utilities.h"
 #include "lbm.h"
-#include <math.h>
+#include <iomanip>
 #include <fstream>
+#include "boundary.h"
 using namespace std;
 
 __host__ void logger(const char* name, float *gpu_src, unsigned int n)
@@ -14,8 +15,15 @@ __host__ void logger(const char* name, float *gpu_src, unsigned int n)
     
     ofstream o;
     o.open(filename);
-    for(int i=0;i<mem_size_scalar;i++)
-        o<<scalar_host[i]<<",";
+    for(int i=0;i<NZ;i++)
+    {
+        for(int j=0;j<NY;j++)
+        {
+            //setprecision(5);
+            for(int k = 0;k<NX;k++)
+                o<<scalar_host[i*(NX*NY) + NX*j + k]<<","<<i<<","<<j<<","<<k<<","<<cpu_boundary[i*(NX*NY) + NX*j + k]<<endl;
+        }
+    }
     o<<endl;
     o.close();
 }
