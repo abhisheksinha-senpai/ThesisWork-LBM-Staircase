@@ -29,7 +29,7 @@ __global__ void gpu_field_Initialization(short *boundary, float *rho, float *ux,
     unsigned int z = threadIdx.z +  blockIdx.z * blockDim.z;
 
     unsigned int sidx = gpu_scalar_index(x, y, z);
-    rho[sidx] = 0.0;
+    rho[sidx] = 0.1;
     ux[sidx] = 0.0;
     uy[sidx] = 0.0;
     uz[sidx] = 0.0;
@@ -67,274 +67,313 @@ __host__ void defineBoundary()
             for(int j=0;j<NX;j++)
             {
                 // cout<<"third loop"<<endl;
-                if(j<NX/8)
-                {
-                    if(j==0)
-                    {
-                        if(i<NY/4 || i>NY/2)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall;
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 2;//inlet;
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00000001;
-                        }
-                    }
-                    else
-                    {
-                        if(i<NY/4 || i>NY/2)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall;
-                        }
-                        else if(i == NY/4 || i == NY/2)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary;
-                            cpu_normals[k*NX*NY + i*NX +j] = (i==NY/4)?0b00000010:0b00100010;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
-                        }
-                   }
-                }
-                else if(j<NX/4)
-                {
-                    if(j==NX/8)
-                    {
-                        if(i>(NY-NY/4) || i<NY/4)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                        else if(i==(NY-NY/4)|| i == NY/2 || i== NY/4)
-                        {
-                            if(i==(NY-NY/4))
-                            {
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
-                                cpu_boundary[k*NX*NY + i*NX +j] = 5;
-                            }
-                            else if(i == NY/2)
-                            {
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
-                                cpu_boundary[k*NX*NY + i*NX +j] = 6;
-                            }
-                            else
-                            {
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
-                                cpu_boundary[k*NX*NY + i*NX +j] = 3;
-                            }
-                        }
-                        else if(i>NY/2 && i<(NY-NY/4))
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00000001;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//fluid
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }  
-                    }
-                    else
-                    {
-                        if(i>(NY-NY/4) || i<NY/4)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                        else if(i==(NY-NY/4) || i==NY/4)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            cpu_normals[k*NX*NY + i*NX +j] = (i==NY/4)?0b00000010:0b01000010;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                    }
-                }
-                else if(j<(NX/2 - NX/4))
-                {
-                    if(j==NX/4)
-                    {
-                        if(i<NY/4)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                        else if(i==(NY-NY/4) || i == NY/4 || i == NY/2 || i == NY - 1)
-                        {
-                            if(i==(NY-NY/4))
-                            {
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
-                                cpu_boundary[k*NX*NY + i*NX +j] = 6;
-                            }
-                            else if(i == NY/4)
-                            {
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
-                                cpu_boundary[k*NX*NY + i*NX +j] = 5;
-                            }
-                            else if(i == NY-1)
-                            {
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
-                                cpu_boundary[k*NX*NY + i*NX +j] = 5;
-                            }
-                            else
-                            {
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
-                                cpu_boundary[k*NX*NY + i*NX +j] = 6;
-                            }
-                        }
-                        else if(i>(NY-NY/4) && i<(NY))
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00000001;
-                        }
-                        else if(i<NY/2 && i>NY/4)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00100001;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }  
-                    }
-                    else
-                    {
-                        if(i<NY/2)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                        else if(i==NY/2 || i == NY-1)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            if(i== NY-1)
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
-                            else
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                    }
-                }
-                else if(j<(NX/2))
-                {
-                    if(j==(NX/2 - NX/4))
-                    {
-                        if(i<NY/2)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                        else if(i<(NY - NY/4))
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            if(i==NY/2)
-                            {
-                                cpu_boundary[k*NX*NY + i*NX +j] = 5;
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
-                            }
-                            else
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b00100001;
+                // if(j<NX/8)
+                // {
+                //     if(j==0)
+                //     {
+                //         if(i<NY/4 || i>NY/2)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall;
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 2;//inlet;
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00000001;
+                //         }
+                //     }
+                //     else
+                //     {
+                //         if(i<NY/4 || i>NY/2)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall;
+                //         }
+                //         else if(i == NY/4 || i == NY/2)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary;
+                //             cpu_normals[k*NX*NY + i*NX +j] = (i==NY/4)?0b00000010:0b00100010;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
+                //         }
+                //    }
+                // }
+                // else if(j<NX/4)
+                // {
+                //     if(j==NX/8)
+                //     {
+                //         if(i>(NY-NY/4) || i<NY/4)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //         else if(i==(NY-NY/4)|| i == NY/2 || i== NY/4)
+                //         {
+                //             if(i==(NY-NY/4))
+                //             {
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 5;
+                //             }
+                //             else if(i == NY/2)
+                //             {
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 6;
+                //             }
+                //             else
+                //             {
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 3;
+                //             }
+                //         }
+                //         else if(i>NY/2 && i<(NY-NY/4))
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00000001;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//fluid
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }  
+                //     }
+                //     else
+                //     {
+                //         if(i>(NY-NY/4) || i<NY/4)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //         else if(i==(NY-NY/4) || i==NY/4)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             cpu_normals[k*NX*NY + i*NX +j] = (i==NY/4)?0b00000010:0b01000010;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //     }
+                // }
+                // else if(j<(NX/2 - NX/4))
+                // {
+                //     if(j==NX/4)
+                //     {
+                //         if(i<NY/4)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //         else if(i==(NY-NY/4) || i == NY/4 || i == NY/2 || i == NY - 1)
+                //         {
+                //             if(i==(NY-NY/4))
+                //             {
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 6;
+                //             }
+                //             else if(i == NY/4)
+                //             {
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 5;
+                //             }
+                //             else if(i == NY-1)
+                //             {
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b01000011;
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 5;
+                //             }
+                //             else
+                //             {
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 6;
+                //             }
+                //         }
+                //         else if(i>(NY-NY/4) && i<(NY))
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00000001;
+                //         }
+                //         else if(i<NY/2 && i>NY/4)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00100001;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }  
+                //     }
+                //     else
+                //     {
+                //         if(i<NY/2)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //         else if(i==NY/2 || i == NY-1)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             if(i== NY-1)
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
+                //             else
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //     }
+                // }
+                // else if(j<(NX/2))
+                // {
+                //     if(j==(NX/2 - NX/4))
+                //     {
+                //         if(i<NY/2)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //         else if(i<(NY - NY/4))
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             if(i==NY/2)
+                //             {
+                //                 cpu_boundary[k*NX*NY + i*NX +j] = 5;
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
+                //             }
+                //             else
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b00100001;
                             
-                        }
-                        else if(i == (NY-NY/4))
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 6;//boundary
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
-                        }
-                        else if(i==NY-1)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }  
-                    }
-                    else
-                    {
-                        if(i<(NY - NY/4))
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                        else if(i==(NY - NY/4) || i == NY-1)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                            if(i== NY-1)
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
-                            else
-                                cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
-                        }
-                        else
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
-                            cpu_normals[k*NX*NY + i*NX +j] = 0;
-                        }
-                    }
-                }
-                else if(j == NX/2)
+                //         }
+                //         else if(i == (NY-NY/4))
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 6;//boundary
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
+                //         }
+                //         else if(i==NY-1)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }  
+                //     }
+                //     else
+                //     {
+                //         if(i<(NY - NY/4))
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 4;//wall
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //         else if(i==(NY - NY/4) || i == NY-1)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //             if(i== NY-1)
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
+                //             else
+                //                 cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
+                //         }
+                //         else
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //         }
+                //     }
+                // }
+                // else if(j == NX/2)
+                // {
+                //     if(i<=(NY - NY/4) || i == NY-1)
+                //     {
+                //         cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
+                //         if(i == NY-1)
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
+                //         else if( i == (NY - NY/4))
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 6;
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
+                //         }
+                //         else if(i == 0)
+                //         {
+                //             cpu_boundary[k*NX*NY + i*NX +j] = 5;
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
+                //         }
+                //     }
+                //     else
+                //     {
+                //         cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
+                //         cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //     }
+                // }
+                // else
+                // {
+                //     if(i == 0 || i == NY -1)
+                //     {
+                //         cpu_boundary[k*NX*NY + i*NX +j] = 4;
+                //         cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //     }
+                //     else if(i == 1 || i == NY -2)
+                //     {
+                //         cpu_boundary[k*NX*NY + i*NX +j] = 3;
+                //         if(i == NY-2)
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
+                //         else
+                //             cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
+                //     }
+                //     else
+                //     {
+                //         cpu_boundary[k*NX*NY + i*NX +j] = 1;
+                //         cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //     }
+                //     if(j == NX-1)
+                //     {
+                //         cpu_boundary[k*NX*NY + i*NX +j] = 7;
+                //         cpu_normals[k*NX*NY + i*NX +j] = 0;
+                //     }
+                // }    
+                
+                if(i == 0 || i == NY -1)
                 {
-                    if(i<=(NY - NY/4) || i == NY-1)
-                    {
-                        cpu_boundary[k*NX*NY + i*NX +j] = 3;//boundary
-                        if(i == NY-1)
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
-                        else if( i == (NY - NY/4))
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 6;
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
-                        }
-                        else if(i == 0)
-                        {
-                            cpu_boundary[k*NX*NY + i*NX +j] = 5;
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00100011;
-                        }
-                    }
-                    else
-                    {
-                        cpu_boundary[k*NX*NY + i*NX +j] = 1;//fluid
-                        cpu_normals[k*NX*NY + i*NX +j] = 0;
-                    }
+                    cpu_boundary[k*NX*NY + i*NX +j] = 4;
+                    cpu_normals[k*NX*NY + i*NX +j] = 0;
                 }
-                else
+                else if(i == 1 || i == NY -2)
                 {
-                    if(i == 0 || i == NY -1)
-                    {
-                        cpu_boundary[k*NX*NY + i*NX +j] = 4;
-                        cpu_normals[k*NX*NY + i*NX +j] = 0;
-                    }
-                    else if(i == 1 || i == NY -2)
-                    {
-                        cpu_boundary[k*NX*NY + i*NX +j] = 3;
-                        if(i == NY-2)
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
-                        else
-                            cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
-                    }
+                    cpu_boundary[k*NX*NY + i*NX +j] = 3;
+                    if(i == NY-2)
+                        cpu_normals[k*NX*NY + i*NX +j] = 0b01000010;
                     else
-                    {
-                        cpu_boundary[k*NX*NY + i*NX +j] = 1;
-                        cpu_normals[k*NX*NY + i*NX +j] = 0;
-                    }
+                        cpu_normals[k*NX*NY + i*NX +j] = 0b00000010;
                     if(j == NX-1)
                     {
                         cpu_boundary[k*NX*NY + i*NX +j] = 7;
                         cpu_normals[k*NX*NY + i*NX +j] = 0;
                     }
-                }            
+                    if(j == 0)
+                    {
+                        cpu_boundary[k*NX*NY + i*NX +j] = 2;
+                        cpu_normals[k*NX*NY + i*NX +j] = 0;
+                    }
+                }
+                else
+                {
+                    cpu_boundary[k*NX*NY + i*NX +j] = 1;
+                    cpu_normals[k*NX*NY + i*NX +j] = 0;
+                    if(j == NX-1)
+                    {
+                        cpu_boundary[k*NX*NY + i*NX +j] = 7;
+                        cpu_normals[k*NX*NY + i*NX +j] = 0;
+                    }
+                    if(j == 0)
+                    {
+                        cpu_boundary[k*NX*NY + i*NX +j] = 2;
+                        cpu_normals[k*NX*NY + i*NX +j] = 0;
+                    }
+                }
             }
         }
     }

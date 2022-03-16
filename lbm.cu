@@ -1,54 +1,57 @@
 #include "lbm.h"
 #include "utilities.h"
 #include "boundary.h"
+#include <math.h>
 
 __device__ void collide(float *field,int x, int y, int z,
      float omusq, float tux, float tuy, float tuz, float wsr, float wsd)
 {
+    float A = delT/tau;
+    float B = 1-A;
     float cidot3u = tux;
-    field[gpu_fieldn_index(x,y,z,1)]  = wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,1)]  =B*field[gpu_fieldn_index(x,y,z,1)]+ A*wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tux;
-    field[gpu_fieldn_index(x,y,z,2)]  = wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,2)]  =B*field[gpu_fieldn_index(x,y,z,2)]+ A*wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
    
     cidot3u = tuy;
-    field[gpu_fieldn_index(x,y,z,3)]  = wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,3)]  =B*field[gpu_fieldn_index(x,y,z,3)]+ A*wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tuy;
-    field[gpu_fieldn_index(x,y,z,4)]  = wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,4)]  =B*field[gpu_fieldn_index(x,y,z,4)]+ A*wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
     
     cidot3u = tuz;
-    field[gpu_fieldn_index(x,y,z,5)]  = wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,5)]  =B*field[gpu_fieldn_index(x,y,z,5)]+ A*wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tuz;
-    field[gpu_fieldn_index(x,y,z,6)]  = wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,6)]  =B*field[gpu_fieldn_index(x,y,z,6)]+ A*wsr*(omusq + cidot3u*(1.0+0.5*cidot3u));
 
     cidot3u = tux+tuy;
-    field[gpu_fieldn_index(x,y,z,7)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,7)]  = B*field[gpu_fieldn_index(x,y,z,7)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tux-tuy;
-    field[gpu_fieldn_index(x,y,z,8)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,8)]  = B*field[gpu_fieldn_index(x,y,z,8)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     
     cidot3u = tux+tuz;
-    field[gpu_fieldn_index(x,y,z,9)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,9)]  = B*field[gpu_fieldn_index(x,y,z,9)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tux-tuz;
-    field[gpu_fieldn_index(x,y,z,10)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,10)]  =B*field[gpu_fieldn_index(x,y,z,10)]+ A* wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     
     cidot3u = tuz+tuy;
-    field[gpu_fieldn_index(x,y,z,11)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,11)]  =B*field[gpu_fieldn_index(x,y,z,11)]+ A* wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u =-tuz-tuy;
-    field[gpu_fieldn_index(x,y,z,12)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,12)]  =B*field[gpu_fieldn_index(x,y,z,12)]+ A* wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
 
     cidot3u = tux-tuy;
-    field[gpu_fieldn_index(x,y,z,13)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,13)]  = B*field[gpu_fieldn_index(x,y,z,13)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tux+tuy;
-    field[gpu_fieldn_index(x,y,z,14)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,14)]  = B*field[gpu_fieldn_index(x,y,z,14)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     
     cidot3u = +tux-tuz;
-    field[gpu_fieldn_index(x,y,z,15)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,15)]  = B*field[gpu_fieldn_index(x,y,z,15)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tux+tuz;
-    field[gpu_fieldn_index(x,y,z,16)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,16)]  = B*field[gpu_fieldn_index(x,y,z,16)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     
     cidot3u = tuy-tuz;
-    field[gpu_fieldn_index(x,y,z,17)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,17)]  = B*field[gpu_fieldn_index(x,y,z,17)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
     cidot3u = -tuy+tuz;
-    field[gpu_fieldn_index(x,y,z,18)]  = wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
+    field[gpu_fieldn_index(x,y,z,18)]  = B*field[gpu_fieldn_index(x,y,z,18)]+ A*wsd*(omusq + cidot3u*(1.0+0.5*cidot3u));
 }
 
 __global__ void gpu_equi_Initialization(float *f0, float *f1, float *rho, float *ux, float *uy, float *uz)
@@ -89,7 +92,7 @@ __host__ void cpu_equi_Initialization()
 
 __host__ void cpu_stream_collide(bool save)
 {
-    dim3  grid(NX/nThreads, NY, 1);
+    dim3  grid(NX/nThreads, NY, NZ);
     // threads in block
     dim3  threads(nThreads, 1, 1);
 
@@ -115,8 +118,8 @@ __global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float 
     unsigned int ym1 = (NY+idy-1)%NY; //back in Y direction
     unsigned int zm1 = (NZ+idz-1)%NZ; //back in Z direction
 
-    if(bound == 2 || bound == 5 || bound ==6 || bound == 7)
-        enforce_boundary(f1, f0, boundary, idx, idy, idz);
+//    if(bound == 2 || bound == 5 || bound ==6 || bound == 7)
+    // stream_enforce_boundary(f1, f0, boundary, idx, idy, idz);
 
     float ft0 = f0[gpu_field0_index(idx,idy,idz)];
 
@@ -146,28 +149,46 @@ __global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float 
     }
     else
     {
-        ft1 = f1[gpu_fieldn_index(idx, idy, idz, 1)];
-        ft2 = f1[gpu_fieldn_index(idx, idy, idz, 2)];
-        ft3 = f1[gpu_fieldn_index(idx, idy, idz, 3)];
-        ft4 = f1[gpu_fieldn_index(idx, idy, idz, 4)];
-        ft5 = f1[gpu_fieldn_index(idx, idy, idz, 5)];
-        ft6 = f1[gpu_fieldn_index(idx, idy, idz, 6)];
-        ft7 = f1[gpu_fieldn_index(idx, idy, idz, 7)];
-        ft8 = f1[gpu_fieldn_index(idx, idy, idz, 8)];
-        ft9 = f1[gpu_fieldn_index(idx, idy, idz, 9)];
-        ft10 = f1[gpu_fieldn_index(idx, idy, idz, 10)];
-        ft11 = f1[gpu_fieldn_index(idx, idy, idz, 11)];
-        ft12 = f1[gpu_fieldn_index(idx, idy, idz, 12)];
-        ft13 = f1[gpu_fieldn_index(idx, idy, idz, 13)];
-        ft14 = f1[gpu_fieldn_index(idx, idy, idz, 14)];
-        ft15 = f1[gpu_fieldn_index(idx, idy, idz, 15)];
-        ft16 = f1[gpu_fieldn_index(idx, idy, idz, 16)];
-        ft17 = f1[gpu_fieldn_index(idx, idy, idz, 17)];
-        ft18 = f1[gpu_fieldn_index(idx, idy, idz, 18)];
+        ft1 = (boundary[gpu_scalar_index(xm1, idy, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 2)]:f1[gpu_fieldn_index(xm1, idy, idz, 1)];
+        ft2 = (boundary[gpu_scalar_index(xp1, idy, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 1)]:f1[gpu_fieldn_index(xp1, idy, idz, 2)];
+        ft3 = (boundary[gpu_scalar_index(idx, ym1, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 4)]:f1[gpu_fieldn_index(idx, ym1, idz, 3)];
+        ft4 = (boundary[gpu_scalar_index(idx, yp1, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 3)]:f1[gpu_fieldn_index(idx, yp1, idz, 4)];
+        ft5 = (boundary[gpu_scalar_index(idx, idy, zm1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 6)]:f1[gpu_fieldn_index(idx, idy, zm1, 5)];
+        ft6 = (boundary[gpu_scalar_index(idx, idy, zp1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 5)]:f1[gpu_fieldn_index(idx, idy, zp1, 6)];
+        ft7 = (boundary[gpu_scalar_index(xm1, ym1, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 8)]:f1[gpu_fieldn_index(xm1, ym1, idz, 7)];
+        ft8 = (boundary[gpu_scalar_index(xp1, yp1, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 7)]:f1[gpu_fieldn_index(xp1, yp1, idz, 8)];
+        ft9 = (boundary[gpu_scalar_index(xm1, idy, zm1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 10)]:f1[gpu_fieldn_index(xm1, idy, zm1, 9)];
+        ft10 = (boundary[gpu_scalar_index(xp1, idy, zp1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 9)]:f1[gpu_fieldn_index(xp1, idy, zp1, 10)];
+        ft11 = (boundary[gpu_scalar_index(idx, ym1, zm1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 12)]:f1[gpu_fieldn_index(idx, ym1, zm1, 11)];
+        ft12 = (boundary[gpu_scalar_index(idx, yp1, zp1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 11)]:f1[gpu_fieldn_index(idx, yp1, zp1, 12)];
+        ft13 = (boundary[gpu_scalar_index(xm1, yp1, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 14)]:f1[gpu_fieldn_index(xm1, yp1, idz, 13)];
+        ft14 = (boundary[gpu_scalar_index(xp1, ym1, idz)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 13)]:f1[gpu_fieldn_index(xp1, ym1, idz, 14)];
+        ft15 = (boundary[gpu_scalar_index(xm1, idy, zp1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 16)]:f1[gpu_fieldn_index(xm1, idy, zp1, 15)];
+        ft16 = (boundary[gpu_scalar_index(xp1, idy, zm1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 15)]:f1[gpu_fieldn_index(xp1, idy, zm1, 16)];
+        ft17 = (boundary[gpu_scalar_index(idx, ym1, zp1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 18)]:f1[gpu_fieldn_index(idx, ym1, zp1, 17)];
+        ft18 = (boundary[gpu_scalar_index(idx, yp1, zm1)] == 4)?f1[gpu_fieldn_index(idx, idy, idz, 17)]:f1[gpu_fieldn_index(idx, yp1, zm1, 18)];
+
+        if (bound == 2)
+        {
+            ft1 = f1[gpu_fieldn_index(idx, idy, idz, 2)] + 0.3*ws;
+            ft9 = f1[gpu_fieldn_index(idx, idy, idz, 10)] + 0.3*wd;
+            ft15 = f1[gpu_fieldn_index(idx, idy, idz, 16)] + 0.3*wd;
+            ft13 = f1[gpu_fieldn_index(idx, idy, idz, 14)] + 0.3*wd;
+            ft7 = f1[gpu_fieldn_index(idx, idy, idz, 8)] + 0.3*wd;
+        }
+
+        if(bound == 7)
+        {
+            ft2 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 2)] - f1[gpu_fieldn_index(idx-2, idy, idz, 2)]; 
+            ft8 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 8)] - f1[gpu_fieldn_index(idx-2, idy, idz, 8)]; 
+            ft10 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 10)] - f1[gpu_fieldn_index(idx-2, idy, idz, 10)];
+            ft14 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 14)] - f1[gpu_fieldn_index(idx-2, idy, idz, 14)]; 
+            ft16 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 16)] - f1[gpu_fieldn_index(idx-2, idy, idz, 16)]; 
+        }
     }
 
-    float lat_rho = ft0+ft1+ft2+ft3+ft4+ft5+ft6+ft7+ft8+ft9+ft10+ft11+ft12+ft13+ft14+ft15+ft16+ft17+ft18;
-    float rhoinv = 1.0/(lat_rho+0.00001);
+    float lat_rho = (bound==4)?0:ft0+ft1+ft2+ft3+ft4+ft5+ft6+ft7+ft8+ft9+ft10+ft11+ft12+ft13+ft14+ft15+ft16+ft17+ft18;
+    float rhoinv = (bound==4)?0:min(10000.0, 1.0/(lat_rho));
 
     float lat_ux = (bound==4)?0:rhoinv*(ft1+ft7+ft9+ft13+ft15-(ft2+ft8+ft10+ft14+ft16));
     float lat_uy = (bound==4)?0:rhoinv*(ft3+ft7+ft11+ft14+ft17-(ft4+ft8+ft12+ft13+ft18));
@@ -196,7 +217,7 @@ __global__ void gpu_stream_collide(short* boundary, float *f0, float *f1, float 
 
 }
 
-__device__ void enforce_boundary(float *f1, float* f0, short* boundary, int idx, int idy, int idz)
+__device__ void stream_enforce_boundary(float *f1, float* f0, short* boundary, int idx, int idy, int idz)
 {
     short bound = boundary[gpu_scalar_index(idx, idy, idz)];
 
@@ -234,7 +255,7 @@ __device__ void enforce_boundary(float *f1, float* f0, short* boundary, int idx,
 
     if (bound == 2)
     {
-        ft2 = f1[gpu_fieldn_index(idx, idy, idz, 1)] + 6*wd;
+        ft2 = f1[gpu_fieldn_index(idx, idy, idz, 1)] + 6*ws;
         ft10 = f1[gpu_fieldn_index(idx, idy, idz, 9)] + 6*wd;
         ft16 = f1[gpu_fieldn_index(idx, idy, idz, 15)] + 6*wd;
         ft14 = f1[gpu_fieldn_index(idx, idy, idz, 13)] + 6*wd;
@@ -243,7 +264,7 @@ __device__ void enforce_boundary(float *f1, float* f0, short* boundary, int idx,
 
     if(bound == 7)
     {
-        ft2 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 1)] - f1[gpu_fieldn_index(idx-2, idy, idz, 2)]; 
+        ft2 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 1)] - f1[gpu_fieldn_index(idx-2, idy, idz, 1)]; 
         ft8 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 8)] - f1[gpu_fieldn_index(idx-2, idy, idz, 8)]; 
         ft10 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 10)] - f1[gpu_fieldn_index(idx-2, idy, idz, 10)];
         ft14 = 2*f1[gpu_fieldn_index(idx-1, idy, idz, 14)] - f1[gpu_fieldn_index(idx-2, idy, idz, 14)]; 
