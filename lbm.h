@@ -5,16 +5,19 @@ const float w0 = 12.0/36.0;  // zero weight
 const float ws = 2.0/36.0;  // adjacent weight
 const float wd = 1.0/36.0; // diagonal weight
 
-const float nu = 1.0/6.0;
-const float tau = 3.0*nu+0.5;
-const float delT = 0.8;
 
-const unsigned int scale = 1;
-const unsigned int NX = 64;
-const unsigned int NY = 16;
+const unsigned int length_scale = 8;
+const unsigned int time_scale = 10;
+const unsigned int NX = 64*length_scale;
+const unsigned int NY = NX/4;
 const unsigned int NZ = 1;
-const unsigned int NSTEPS = 10*scale*scale;
-const unsigned int NSAVE  =  1*scale*scale;
+
+const float nu = 1.0/6.0;
+const float delT = 1.0;
+const float tau = 3.0*nu+0.5*delT;
+
+const unsigned int NSTEPS = 100*time_scale*time_scale;
+const unsigned int NSAVE  =  10*time_scale*time_scale;
 
 const unsigned int ndir = 19;
 const unsigned int mem_size_0dir   = sizeof(float)*NX*NY*NZ;

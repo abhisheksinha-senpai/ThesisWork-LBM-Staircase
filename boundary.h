@@ -9,6 +9,6 @@ extern short *gpu_normals;
 __host__ void cpu_field_Initialization();
 __host__ void defineBoundary();
 __global__ void gpu_field_Initialization(short *boundary, float *rho, float *ux, float *uy, float *uz, float* field, float *field0);
-__device__ void stream_enforce_boundary(float *f1, float* f0, short* boundary, int idx, int idy, int idz);
+// __device__ void stream_enforce_boundary(float *f1, float* f0, short* boundary, int idx, int idy, int idz);
 
 #endif
