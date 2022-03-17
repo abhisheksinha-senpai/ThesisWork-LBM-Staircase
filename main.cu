@@ -22,10 +22,10 @@ int main(int argc, char* argv[])
         save = ((n+1)%NSAVE == 0);
         if(save)
         {
-            logger("rho",rho_gpu,n+1);
+            //logger("rho",rho_gpu,n+1);
             logger("ux", ux_gpu, n+1);
-            logger("uy", uy_gpu, n+1);
-            logger("uz", uz_gpu, n+1);
+            //logger("uy", uy_gpu, n+1);
+            //logger("uz", uz_gpu, n+1);
         }
         cpu_stream_collide(save);
         temp = f1_gpu;

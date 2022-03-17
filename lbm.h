@@ -10,21 +10,19 @@ const unsigned int length_scale = 8;
 const unsigned int time_scale = 10;
 const unsigned int NX = 64*length_scale;
 const unsigned int NY = NX/4;
-const unsigned int NZ = 1;
+const unsigned int NZ = 2;
 
 const float nu = 1.0/6.0;
-const float delT = 1.0;
-const float tau = 3.0*nu+0.5*delT;
+const float tau = 3.0*nu+0.5;
 
-const unsigned int NSTEPS = 100*time_scale*time_scale;
-const unsigned int NSAVE  =  10*time_scale*time_scale;
+const unsigned int NSTEPS = 20*time_scale*time_scale;
+const unsigned int NSAVE  =  0.5*time_scale*time_scale;
 
 const unsigned int ndir = 19;
 const unsigned int mem_size_0dir   = sizeof(float)*NX*NY*NZ;
 const unsigned int mem_size_n0dir  = sizeof(float)*NX*NY*NZ*(ndir-1);
 const unsigned int mem_size_scalar = sizeof(float)*NX*NY*NZ;
 const unsigned int mem_size_bound = sizeof(short)*NX*NY*NZ;
-const unsigned int mem_size_normal = sizeof(short)*NX*NY*NZ;
 
 extern unsigned int mem_size_props;
 extern float *f0_gpu,*f1_gpu,*f2_gpu;
